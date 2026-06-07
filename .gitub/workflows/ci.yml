@@ -1,0 +1,66 @@
+# .github/workflows/ci.yml
+name: TechPakistan CI Pipeline
+ 
+# Kab chalega yeh pipeline?
+on:
+ push:
+   branches: [ main, develop ]
+ pull_request:
+   branches: [ main ]
+ 
+jobs:
+ # ─── JOB 1: HTML Validation ───────────────────────────
+ validate-html:
+   name: HTML Validate karo
+   runs-on: ubuntu-latest
+   
+   steps:
+     # Step 1: Code lao
+     - name: Checkout code
+       uses: actions/checkout@v3
+     
+     # Step 2: Node.js setup
+     - name: Setup Node.js
+       uses: actions/setup-node@v3
+       with:
+         node-version: '18'
+     
+     # Step 3: HTML validator install karo
+     - name: HTML Validator install
+       run: npm install -g html-validate
+     
+     # Step 4: Validate karo
+     - name: HTML files validate karo
+       run: html-validate index.html
+ 
+ # ─── JOB 2: File Structure Check ──────────────────────
+ check-structure:
+   name: File Structure check karo
+   runs-on: ubuntu-latest
+   
+   steps:
+     - name: Checkout code
+       uses: actions/checkout@v3
+     
+     - name: Required files check karo
+       run: |
+         echo "Checking required files..."
+         test -f index.html && echo "✅ index.html exists" || exit 1
+         test -f src/css/style.css && echo "✅ style.css exists" || exit 1
+         test -f src/js/main.js && echo "✅ main.js exists" || exit 1
+         test -f README.md && echo "✅ README.md exists" || exit 1
+         echo "All files present!"
+ 
+ # ─── JOB 3: Link Check ────────────────────────────────
+ check-links:
+   name: Links check karo
+   runs-on: ubuntu-latest
+   
+   steps:
+     - name: Checkout code
+       uses: actions/checkout@v3
+     
+     - name: CSS link check
+       run: |
+         grep -q "style.css" index.html && echo "✅ CSS linked" || echo "⚠️ CSS link missing"
+         grep -q "main.js" index.html && echo "✅ JS linked" || echo "⚠️ JS link missing"
